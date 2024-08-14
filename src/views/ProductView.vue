@@ -1,81 +1,167 @@
 <template>
   <div>
     <!-- <h1 class="text-center">Shopping Mall</h1> -->
-    <v-carousel hide-delimiter-background height="100vh">
+    <!-- <v-carousel hide-delimiter-background height="100vh">
       <v-carousel-item
         v-for="(item, i) in items"
         :key="i"
         :src="item.src"
         class="custom-img"
       ></v-carousel-item>
-    </v-carousel>
+    </v-carousel> -->
     <div class="ma-6">
-      <h1 class="text-uppercase text-center">our products</h1>
-      <v-chip-group
-        active-class="deep-purple--text text--accent-4"
-        class="d-flex justify-center align-center"
-        v-model="selection"
-      >
-        <v-chip outlined large class="ma-2">Home</v-chip>
-        <v-chip outlined large class="ma-2">Earrings</v-chip>
-        <v-chip outlined large class="ma-2">Necklaces</v-chip>
-        <v-chip outlined large class="ma-2">Rings</v-chip>
-        <v-chip outlined large class="ma-2">Hats</v-chip>
-        <v-chip outlined large class="ma-2">Sunglasses</v-chip>
-      </v-chip-group>
-      <v-btn color="success" fab @click="newItem()"
+      <h1 class="text-uppercase text-center my-8 text-h1">jewelry</h1>
+      <v-btn
+        color="success"
+        fab
+        @click="newItem()"
+        style="position: fixed; right: 20px; bottom: 20px; z-index: 1"
         ><v-icon>mdi-plus</v-icon></v-btn
       >
+      <h2 class="text-uppercase text-center my-8">Feature</h2>
+
+      <v-tabs class="d-flex justify-center align-center">
+        <v-tab>Best Seller</v-tab>
+        <v-tab>Trending</v-tab>
+        <v-tab>New</v-tab>
+      </v-tabs>
     </div>
-    <div class="ma-6">
+    <div class="ma-3">
       <v-slide-group class="pa-4" center-active show-arrows>
-        <v-slide-item
-          v-for="(item, index) in productData"
-          :key="index"
-          v-slot="{ active, toggle }"
-        >
+        <v-slide-item v-for="(item, index) in productData" :key="index">
           <v-card
-            :color="active ? 'grey lighten-1' : 'white'"
-            class="ma-4 text-center text-h5 custom-img"
-            height="500 "
+            class="ma-4 text-h5 custom-img d-flex flex-column"
+            height="500"
             width="400"
-            @click="toggle"
           >
             <v-img :src="item.image" height="300" />
-            <p>{{ item.productName }}</p>
-            <p>฿{{ item.price }}</p>
-            <p>{{ item.stock }}</p>
-            <v-card-actions class="d-flex justify-center">
+            <v-card-title>{{ item.productName }}</v-card-title>
+
+            <v-card-subtitle v-if="item.stock === 0">
+              <span>{{ item.price }} ฿ Sold Out</span>
+            </v-card-subtitle>
+            <v-card-subtitle v-else>
+              {{ item.price }} ฿ stock: {{ item.stock }}
+            </v-card-subtitle>
+
+            <!-- Adding flex-grow-1 to ensure this section takes up remaining space -->
+            <div class="flex-grow-1"></div>
+
+            <v-card-actions class="d-flex justify-end">
               <v-btn
+                text
                 color="success"
                 class="align-center"
                 @click="editItem(item)"
-                >edit</v-btn
-              >
-              <v-btn color="info" class="align-center" @click="newOrder(item)"
-                >Add to cart</v-btn
+                >Edit</v-btn
               >
               <v-btn
+                text
+                color="info"
+                class="align-center"
+                @click="newOrder(item)"
+                >Add to Cart</v-btn
+              >
+              <v-btn
+                text
                 color="error"
                 class="align-center"
                 @click="deleteItem(item)"
                 >Delete</v-btn
               >
+              <!-- <v-btn text color="info" class="align-center" href="/id">Detail</v-btn> -->
             </v-card-actions>
           </v-card>
         </v-slide-item>
       </v-slide-group>
     </div>
+    <!-- band -->
     <div
       style="
-        background-color: whitesmoke;
+        background-image: url('https://i.pinimg.com/564x/27/4d/3b/274d3b7a4ab4a91c9b540ef9a0e95bfe.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
         height: 100vh;
+        width: 100vw;
         display: flex;
         justify-content: center;
         align-items: center;
       "
     >
-      <h1 class="text-uppercase">Rings for every occasion</h1>
+      <h1
+        style="
+          text-transform: uppercase;
+          color: black;
+          border: 10px solid black;
+          padding: 5rem;
+          border-radius: 10px; /* Optional: to add rounded corners */
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: to add shadow */
+        "
+      >
+        <span class="text-h3"> Sold Out in 24 hours Back In Stock</span>
+      </h1>
+    </div>
+    <div class="ma-8">
+      <h2 class="text-uppercase text-center my-8">Our Products</h2>
+
+      <v-tabs class="d-flex justify-center align-center my-8">
+        <v-tab>All</v-tab>
+        <v-tab>Earrings</v-tab>
+        <v-tab>Necklaces</v-tab>
+        <v-tab>Rings</v-tab>
+        <v-tab>Hats</v-tab>
+        <v-tab>Sunglasses</v-tab>
+      </v-tabs>
+      <div>
+        <v-row>
+          <v-col cols="3" v-for="(item, index) in productData" :key="index">
+            <v-card
+              class="ma-4 text-h5 custom-img d-flex flex-column"
+              height="500"
+              width="400"
+            >
+              <v-img :src="item.image" height="300" />
+              <v-card-title>{{ item.productName }}</v-card-title>
+
+              <v-card-subtitle v-if="item.stock === 0">
+                <span>{{ item.price }} ฿ Sold Out</span>
+              </v-card-subtitle>
+              <v-card-subtitle v-else>
+                {{ item.price }} ฿ stock: {{ item.stock }}
+              </v-card-subtitle>
+
+              <!-- Adding flex-grow-1 to ensure this section takes up remaining space -->
+              <div class="flex-grow-1"></div>
+
+              <v-card-actions class="d-flex justify-end">
+                <v-btn
+                  text
+                  color="success"
+                  class="align-center"
+                  @click="editItem(item)"
+                  >Edit</v-btn
+                >
+                <v-btn
+                  text
+                  color="info"
+                  class="align-center"
+                  @click="newOrder(item)"
+                  >Add to Cart</v-btn
+                >
+                <v-btn
+                  text
+                  color="error"
+                  class="align-center"
+                  @click="deleteItem(item)"
+                  >Delete</v-btn
+                >
+                <!-- <v-btn text color="info" class="align-center" href="/id">Detail</v-btn> -->
+              </v-card-actions>
+            </v-card>
+          </v-col>
+        </v-row>
+      </div>
     </div>
     <v-dialog v-model="dialogedit" max-width="500px">
       <v-card>
@@ -147,28 +233,28 @@
     <v-dialog v-model="dialogCart" max-width="500px">
       <v-card>
         <v-card-title primary-title> Add to cart </v-card-title>
-        <v-card-text>
+        <div class="pa-3">
           <v-row>
-            <v-col cols="6" class="text-h5">
-              <p>{{ postOrder.productName }}</p>
-              <p>฿{{ postOrder.price }}</p>
-              <p>{{ postOrder.stock }}</p>
-              <v-btn-toggle>
-                <!-- <v-btn><v-icon>mdi-minus</v-icon></v-btn> -->
-                <v-text-field
-                  name="amount"
-                  label="amount"
-                  id="amount"
-                  v-model="postOrder.amount"
-                ></v-text-field>
-                <!-- <v-btn><v-icon>mdi-plus</v-icon></v-btn> -->
-              </v-btn-toggle>
+            <v-col cols="8">
+              <p class="text-h5 text-black">{{ postOrder.productName }}</p>
+              <p class="text-subtitle-1 text-black">
+                Price : {{ postOrder.price }}
+              </p>
+              <p class="text-subtitle-1 text-black">
+                Stock : {{ postOrder.stock }}
+              </p>
+              <v-text-field
+                v-model="postOrder.amount"
+                name="amount"
+                label="amount"
+                type="number"
+              />
             </v-col>
-            <v-col cols="6">
+            <v-col cols="4">
               <v-img :src="postOrder.image" alt="Product Image" contain></v-img>
             </v-col>
           </v-row>
-        </v-card-text>
+        </div>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn text color="error" @click="closeItem()">cancel</v-btn>

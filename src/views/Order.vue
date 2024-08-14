@@ -1,36 +1,60 @@
 <template>
   <div>
-    <!-- <v-row>
-      <v-col cols="8" class="purple lighten-3">
-        <div class="d-flex justify-space-between">
+    <v-row>
+      <v-col cols="8">
+        <div class="d-flex justify-space-between pa-6">
           <h1>Shopping Cart</h1>
-          <h1>3 Items</h1>
+          <h1>{{ orderItem }} Items</h1>
         </div>
+        <v-divider style="color: black; height: 20px"></v-divider>
       </v-col>
-      <v-col cols="4" class="green lighten-3">
-        <h1>Order Summary</h1>
+      <v-col cols="4">
+        <div class="pa-6">
+          <!-- <h1>Order Summary</h1> -->
+        </div>
+        <!-- <v-divider></v-divider> -->
       </v-col>
-    </v-row> -->
-    <v-data-table
-      dense
-      :headers="headers"
-      :items="mergedOrders"
-      item-key="name"
-      class="elevation-1 ma-6"
-    ></v-data-table>
+    </v-row>
+
+    <v-simple-table class="ma-6">
+      <template v-slot:default>
+        <thead>
+          <tr>
+            <!-- ใช้ v-for เพื่อสร้างหัวตารางจาก headers -->
+            <th v-for="header in headers" :key="header.value">
+              {{ header.text }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in mergedOrders" :key="item._id">
+            <!-- แสดงข้อมูลของแต่ละรายการตาม header ที่กำหนด -->
+            <td v-for="header in headers" :key="header.value">
+              {{ item[header.value] }}
+            </td>
+          </tr>
+        </tbody>
+      </template>
+    </v-simple-table>
   </div>
 </template>
 
 <script>
+// import { EventBus } from "@/EventBus";
+
 export default {
+  name: "App",
   data() {
     return {
       orderData: [],
       productOrderData: [],
+      orderItem: 0,
       headers: [
         { text: "Product Name", value: "productName" },
+        // { text: "Product Image", value: "image" },
         { text: "Price", value: "price" },
         { text: "Order Amount", value: "amount" },
+        { text: "Actions", value: "actions", sortable: false },
       ],
     };
   },
@@ -41,16 +65,15 @@ export default {
     }
   },
   computed: {
-    // รวมข้อมูล orders กับ productName จาก products
     mergedOrders() {
       return this.orderData.map((order) => {
-        // หาข้อมูล product ที่ตรงกับ productId ของ order
         const product = this.productOrderData.find(
           (p) => p._id === order.productId
         );
         return {
           ...order,
           productName: product ? product.productName : "Unknown",
+          image: product ? product.image : "",
           ...product,
         };
       });
@@ -74,6 +97,7 @@ export default {
         .then((response) => {
           console.log(response.data);
           this.orderData = response.data.data;
+          this.orderItem = response.data.data.length;
           console.log(this.orderData);
         });
       //get product order
@@ -155,8 +179,34 @@ export default {
         alert("Error จ้า");
       }
     },
+    // mounted() {
+    //   EventBus.$on("callOrderData", this.callAlert);
+    // },
+    // beforeDestroy() {
+    //   EventBus.$off("callOrderData", this.callAlert);
+    // },
+    // editItem(item) {
+    //   this.editedIndex = this.desserts.indexOf(item);
+    //   this.editedItem = Object.assign({}, item);
+    //   this.dialog = true;
+    // },
+    // deleteItem (item) {
+    //   this.editedIndex = this.desserts.indexOf(item)
+    //   this.editedItem = Object.assign({}, item)
+    //   this.dialogDelete = true
+    // },
   },
 };
 </script>
 
-<style></style>
+<style>
+/* .custom-table-text {
+  font-size: 40px;
+} */
+.custom-table-text .v-data-table__item {
+  font-size: 40px; /* Adjust item font size */
+}
+.custom-table-text .v-data-table__header {
+  font-size: 40px; /* Adjust header font size */
+}
+</style>

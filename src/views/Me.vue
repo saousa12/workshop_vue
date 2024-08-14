@@ -119,7 +119,7 @@ export default {
           title: "Favorite",
           content: "ราดหน้าหมี่กรอบ, สีฟ้า",
         },
-        { title: "Hobby", content: "ดูหนัง, ทำความสะอาด" },
+        { title: "Hobby", content: "ดูหนัง" },
       ],
       movies: [
         {
