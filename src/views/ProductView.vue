@@ -1,14 +1,5 @@
 <template>
   <div>
-    <!-- <h1 class="text-center">Shopping Mall</h1> -->
-    <!-- <v-carousel hide-delimiter-background height="100vh">
-      <v-carousel-item
-        v-for="(item, i) in items"
-        :key="i"
-        :src="item.src"
-        class="custom-img"
-      ></v-carousel-item>
-    </v-carousel> -->
     <div class="ma-6">
       <h1 class="text-uppercase text-center my-8 text-h1">jewelry</h1>
       <v-btn
@@ -18,90 +9,15 @@
         style="position: fixed; right: 20px; bottom: 20px; z-index: 1"
         ><v-icon>mdi-plus</v-icon></v-btn
       >
-      <h2 class="text-uppercase text-center my-8">Feature</h2>
+      <!-- <h2 class="text-uppercase text-center my-8">Feature</h2> -->
 
-      <v-tabs class="d-flex justify-center align-center">
+      <!-- <v-tabs class="d-flex justify-center align-center">
         <v-tab>Best Seller</v-tab>
         <v-tab>Trending</v-tab>
         <v-tab>New</v-tab>
-      </v-tabs>
+      </v-tabs> -->
     </div>
-    <div class="ma-3">
-      <v-slide-group class="pa-4" center-active show-arrows>
-        <v-slide-item v-for="(item, index) in productData" :key="index">
-          <v-card
-            class="ma-4 text-h5 custom-img d-flex flex-column"
-            height="500"
-            width="400"
-          >
-            <v-img :src="item.image" height="300" />
-            <v-card-title>{{ item.productName }}</v-card-title>
 
-            <v-card-subtitle v-if="item.stock === 0">
-              <span>{{ item.price }} ฿ Sold Out</span>
-            </v-card-subtitle>
-            <v-card-subtitle v-else>
-              {{ item.price }} ฿ stock: {{ item.stock }}
-            </v-card-subtitle>
-
-            <!-- Adding flex-grow-1 to ensure this section takes up remaining space -->
-            <div class="flex-grow-1"></div>
-
-            <v-card-actions class="d-flex justify-end">
-              <v-btn
-                text
-                color="success"
-                class="align-center"
-                @click="editItem(item)"
-                >Edit</v-btn
-              >
-              <v-btn
-                text
-                color="info"
-                class="align-center"
-                @click="newOrder(item)"
-                >Add to Cart</v-btn
-              >
-              <v-btn
-                text
-                color="error"
-                class="align-center"
-                @click="deleteItem(item)"
-                >Delete</v-btn
-              >
-              <!-- <v-btn text color="info" class="align-center" href="/id">Detail</v-btn> -->
-            </v-card-actions>
-          </v-card>
-        </v-slide-item>
-      </v-slide-group>
-    </div>
-    <!-- band -->
-    <div
-      style="
-        background-image: url('https://i.pinimg.com/564x/27/4d/3b/274d3b7a4ab4a91c9b540ef9a0e95bfe.jpg');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        height: 100vh;
-        width: 100vw;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      "
-    >
-      <h1
-        style="
-          text-transform: uppercase;
-          color: black;
-          border: 10px solid black;
-          padding: 5rem;
-          border-radius: 10px; /* Optional: to add rounded corners */
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: to add shadow */
-        "
-      >
-        <span class="text-h3"> Sold Out in 24 hours Back In Stock</span>
-      </h1>
-    </div>
     <div class="ma-8">
       <h2 class="text-uppercase text-center my-8">Our Products</h2>
 
@@ -266,54 +182,14 @@
 </template>
 
 <script>
+import { EventBus } from "@/EventBus";
 export default {
   data() {
     return {
-      productImg: [],
+      token: "",
       selection: 0,
       dialogedit: false,
       dialogCart: false,
-      items: [
-        {
-          src: "https://cdn.pixabay.com/photo/2017/01/16/14/17/make-up-1984115_1280.jpg",
-        },
-        {
-          src: "https://cdn.pixabay.com/photo/2018/01/14/00/05/makeup-3081015_1280.jpg",
-        },
-        {
-          src: "https://cdn.pixabay.com/photo/2017/10/03/12/07/bottle-2812214_640.jpg",
-        },
-        {
-          src: "https://cdn.pixabay.com/photo/2020/10/10/18/02/makeup-5643868_1280.jpg",
-        },
-      ],
-      products: [
-        {
-          productName: "Perfectly poised Hoops",
-          price: "$99.00",
-          img: "https://i.pinimg.com/236x/90/5a/02/905a0268abf815aef92a309201823b6b.jpg",
-        },
-        {
-          productName: "Lipstick",
-          price: "$200.00",
-          img: "https://i.pinimg.com/736x/dd/fb/56/ddfb56db35abccd5e96e7d0b6dee3f07.jpg",
-        },
-        {
-          productName: "Lipstick",
-          price: "$99.00",
-          img: "https://i.pinimg.com/474x/c5/5b/56/c55b56de6c9283417b0d51fc7e615b02.jpg",
-        },
-        {
-          productName: "Lipstick",
-          price: "$99.00",
-          img: "https://cdn.pixabay.com/photo/2016/07/21/05/52/lipstick-1531929_640.jpg",
-        },
-        {
-          productName: "Lipstick",
-          price: "$99.00",
-          img: "https://cdn.pixabay.com/photo/2016/07/21/05/52/lipstick-1531929_640.jpg",
-        },
-      ],
       productData: [],
       productOrderData: [],
       postdata: {
@@ -340,10 +216,18 @@ export default {
     };
   },
   created() {
-    this.setToken();
-    if (localStorage.getItem("Token") != undefined) {
-      this.getData();
-    }
+    EventBus.$on("token", (token) => {
+      this.token = token;
+      console.log("Received token:", token);
+    });
+
+    // if (localStorage.getItem("Token") != undefined) {
+    this.getData();
+    // }
+  },
+  beforeDestroy() {
+    // อย่าลืมหยุดฟังเหตุการณ์เมื่อ component ถูกทำลาย
+    EventBus.$off("token");
   },
   computed: {
     savemode() {
@@ -388,12 +272,6 @@ export default {
       } else {
         // this.savePostData();
       }
-    },
-    setToken() {
-      localStorage.setItem(
-        "Token",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YjMzMDk1ZmE0YWNiMWE0ZmM3YzBhZSIsInVzZXJuYW1lIjoiYWEiLCJhcHByb3ZlIjoiYXBwcm92ZSIsImlhdCI6MTcyMzU1NDQ3OH0.numvFZEigzX4KmeIqBtP1YmrYSw3QilLlHLTF9m-7is"
-      );
     },
     getData() {
       this.axios

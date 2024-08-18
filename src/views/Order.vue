@@ -1,200 +1,149 @@
 <template>
   <div>
-    <v-row>
-      <v-col cols="8">
-        <div class="d-flex justify-space-between pa-6">
-          <h1>Shopping Cart</h1>
-          <h1>{{ orderItem }} Items</h1>
-        </div>
-        <v-divider style="color: black; height: 20px"></v-divider>
-      </v-col>
-      <v-col cols="4">
-        <div class="pa-6">
-          <!-- <h1>Order Summary</h1> -->
-        </div>
-        <!-- <v-divider></v-divider> -->
-      </v-col>
-    </v-row>
+    <div>
+      <div class="d-flex justify-space-between pa-6">
+        <h1>Shopping Cart</h1>
+        <h1>{{ orderItem }} Items</h1>
+      </div>
+      <v-divider style="color: black; height: 20px"></v-divider>
+    </div>
 
-    <v-simple-table class="ma-6">
-      <template v-slot:default>
-        <thead>
-          <tr>
-            <!-- ใช้ v-for เพื่อสร้างหัวตารางจาก headers -->
-            <th v-for="header in headers" :key="header.value">
-              {{ header.text }}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="item in mergedOrders" :key="item._id">
-            <!-- แสดงข้อมูลของแต่ละรายการตาม header ที่กำหนด -->
-            <td v-for="header in headers" :key="header.value">
-              {{ item[header.value] }}
-            </td>
-          </tr>
-        </tbody>
-      </template>
-    </v-simple-table>
+    <v-container>
+      <v-row>
+        <v-col
+          v-for="(header, index) in headers"
+          :key="index"
+          style="background-color: lightskyblue; margin-top: 30px"
+        >
+          <h3>{{ header.text }}</h3>
+        </v-col>
+      </v-row>
+
+      <!-- Table Data -->
+      <v-row v-for="(order, orderIndex) in mergedOrders" :key="orderIndex">
+        <v-col v-for="(header, colIndex) in headers" :key="colIndex">
+          <div v-if="header.text === 'Order Amount'">
+            <v-btn icon @click="updateAmount(order, 1)">
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+            <span>{{ order.amount }}</span>
+            <v-btn icon @click="updateAmount(order, -1)">
+              <v-icon>mdi-minus</v-icon>
+            </v-btn>
+          </div>
+          <div v-if="header.value === 'actions'">
+            <v-btn color="error" class="text-white" @click="deleteItem(order)"
+              >Delete</v-btn
+            >
+          </div>
+          <div v-else>
+            <h4>{{ order[header.value] }}</h4>
+          </div>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 
 <script>
-// import { EventBus } from "@/EventBus";
+import { EventBus } from "@/EventBus";
 
 export default {
   name: "App",
   data() {
     return {
+      token: "",
       orderData: [],
       productOrderData: [],
+      mergedOrders: [],
       orderItem: 0,
       headers: [
+        { text: "Order Id", value: "_id" },
         { text: "Product Name", value: "productName" },
-        // { text: "Product Image", value: "image" },
         { text: "Price", value: "price" },
-        { text: "Order Amount", value: "amount" },
+        { text: "Order Amount", value: "" },
         { text: "Actions", value: "actions", sortable: false },
       ],
     };
   },
+
   created() {
-    this.setToken();
-    if (localStorage.getItem("Token") != undefined) {
-      this.getData();
-    }
-  },
-  computed: {
-    mergedOrders() {
-      return this.orderData.map((order) => {
-        const product = this.productOrderData.find(
-          (p) => p._id === order.productId
-        );
-        return {
-          ...order,
-          productName: product ? product.productName : "Unknown",
-          image: product ? product.image : "",
-          ...product,
-        };
-      });
-    },
+    EventBus.$on("token", (token) => {
+      this.token = token;
+      console.log("Received token:", token);
+    });
+    this.getData();
   },
 
   methods: {
-    setToken() {
-      localStorage.setItem(
-        "Token",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YjMzMDk1ZmE0YWNiMWE0ZmM3YzBhZSIsInVzZXJuYW1lIjoiYWEiLCJhcHByb3ZlIjoiYXBwcm92ZSIsImlhdCI6MTcyMzU1NDQ3OH0.numvFZEigzX4KmeIqBtP1YmrYSw3QilLlHLTF9m-7is"
-      );
+    updateAmount(order, amountChange) {
+      const newAmount = order.amount + amountChange;
+      if (newAmount >= 0) {
+        order.amount = newAmount;
+        // คุณสามารถทำการอัปเดตเพิ่มเติม เช่น ส่งคำขอไปยัง API เพื่อลบข้อมูล
+      }
     },
-    getData() {
-      this.axios
-        .get("http://localhost:3000/api/v1/orders", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("Token")}`,
-          },
-        })
-        .then((response) => {
-          console.log(response.data);
-          this.orderData = response.data.data;
-          this.orderItem = response.data.data.length;
-          console.log(this.orderData);
-        });
-      //get product order
-      this.axios
-        .get("http://localhost:3000/api/v1/products", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("Token")}`,
-          },
-        })
-        .then((response) => {
-          console.log(response.data);
-          this.productOrderData = response.data.data;
-          console.log(this.productOrderData);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    },
-
-    async savePutData() {
+    async getData() {
       try {
-        const { data } = await this.axios.put(
-          "http://localhost:3000/api/v1/products/" + this.id,
-          // { approve: true },
-          this.postdata,
+        const ordersResponse = await this.axios.get(
+          "http://localhost:3000/api/v1/orders",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("Token")}`,
             },
           }
         );
-        console.log(data);
-        alert("Update Complete");
-        this.getData();
-        this.closeItem();
+        const productsResponse = await this.axios.get(
+          "http://localhost:3000/api/v1/products",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("Token")}`,
+            },
+          }
+        );
+
+        const orders = ordersResponse.data.data;
+        this.orderItem = ordersResponse.data.data.length;
+        const products = productsResponse.data.data;
+
+        this.mergedOrders = orders.map((order) => {
+          const product = products.find((p) => p._id === order.productId);
+          return {
+            ...order,
+            productName: product ? product.productName : "Unknown",
+            price: product.price,
+          };
+        });
       } catch (error) {
-        console.log(error);
-        alert("Error จ้า");
+        console.error(error);
       }
     },
+
     async deleteItem(item) {
-      if (confirm("delete " + item.productName)) {
+      console.log(item);
+
+      if (confirm("delete order " + item.productName)) {
         try {
-          const { data } = await this.axios.delete(
-            "http://localhost:3000/api/v1/products/" + item._id,
+          await this.axios.delete(
+            "http://localhost:3000/api/v1/orders/" + item._id,
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("Token")}`,
               },
             }
           );
-          console.log(data);
           alert("Delete Complete");
           this.getData();
-          this.closeItem();
         } catch (error) {
           console.log(error);
           alert("Error จ้า");
         }
       }
     },
-    async savePostOrder() {
-      try {
-        const { data } = await this.axios.post(
-          "http://localhost:3000/api/v1/products/" + this.id + "/orders",
-          this.postOrder,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("Token")}`,
-            },
-          }
-        );
-        console.log(data);
-        alert("Create order Complete");
-        this.getData();
-        this.closeItem();
-      } catch (error) {
-        console.log(error);
-        alert("Error จ้า");
-      }
+    beforeDestroy() {
+      // อย่าลืมหยุดฟังเหตุการณ์เมื่อ component ถูกทำลาย
+      EventBus.$off("token");
     },
-    // mounted() {
-    //   EventBus.$on("callOrderData", this.callAlert);
-    // },
-    // beforeDestroy() {
-    //   EventBus.$off("callOrderData", this.callAlert);
-    // },
-    // editItem(item) {
-    //   this.editedIndex = this.desserts.indexOf(item);
-    //   this.editedItem = Object.assign({}, item);
-    //   this.dialog = true;
-    // },
-    // deleteItem (item) {
-    //   this.editedIndex = this.desserts.indexOf(item)
-    //   this.editedItem = Object.assign({}, item)
-    //   this.dialogDelete = true
-    // },
   },
 };
 </script>

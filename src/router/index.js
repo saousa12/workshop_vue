@@ -24,17 +24,12 @@ const routes = [
     name: "toolbar",
     component: () => import("../views/Toolbar.vue"),
     children: [
-      { path: "/me", name: "me", component: () => import("../views/Me.vue") },
       {
         path: "/simple",
         name: "simple",
         component: () => import("../views/Simple.vue"),
       },
-      {
-        path: "/grade",
-        name: "grade",
-        component: () => import("../views/Grade.vue"),
-      },
+
       {
         path: "/apicon",
         name: "apicon",
@@ -57,6 +52,17 @@ const routes = [
         path: "/orders",
         name: "orders",
         component: () => import("../views/Order.vue"),
+      },
+      {
+        path: "/login",
+        name: "login",
+        component: () => import("../components/login.vue"),
+      },
+      { path: "/me", name: "me", component: () => import("../views/Me.vue") },
+      {
+        path: "/grade",
+        name: "grade",
+        component: () => import("../views/Grade.vue"),
       },
     ],
   },

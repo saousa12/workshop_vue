@@ -13,7 +13,7 @@ export default {
   methods: {
     callMain() {
       //   this.$emit("callAlert");
-      EventBus.$emit("callAlertParam", "ปลา");
+      EventBus.$emit("callAlertParam", "ousa");
     },
   },
 };

@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>Api con page</h1>
-    <h1>{{ apidata }}</h1>
+    <!-- <h1>{{ apidata }}</h1> -->
     <v-row>
       <v-col cols="12">
         <v-btn color="success" @click="newItem()">newItem</v-btn>

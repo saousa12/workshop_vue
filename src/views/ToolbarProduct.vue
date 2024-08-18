@@ -24,12 +24,11 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn href="" target="_blank" text>
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
       <v-btn href="/orders" text>
-        <v-icon style="transform: scaleX(-1)">mdi-cart-outline</v-icon>
-        <!-- <p>{{ orderItem }}</p> -->
+        <v-icon style="transform: scaleX(-1)">mdi-cart-outline </v-icon>
+        <h3>
+          {{ amountOrder }}
+        </h3>
       </v-btn>
 
       <v-btn text @click="select = !select">
@@ -43,16 +42,18 @@
     </v-app-bar>
     <v-card class="list-item" max-width="300" tile v-if="select">
       <v-list>
-        <v-list-item-group color="primary">
-          <v-list-item v-for="(item, i) in items" :key="i">
-            <v-list-item-icon>
-              <v-icon>{{ item.icon }}</v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>{{ item.text }}</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list-item-group>
+        <v-list-item :to="{ name: 'me' }">
+          <v-list-item-title>Profile</v-list-item-title>
+        </v-list-item>
+        <v-list-item :to="{ name: 'grade' }">
+          <v-list-item-title>Grade</v-list-item-title>
+        </v-list-item>
+        <v-list-item @click="setToken">
+          <v-list-item-icon>
+            <v-icon>mdi-login-variant</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title>Logout</v-list-item-title>
+        </v-list-item>
       </v-list>
     </v-card>
     <v-main>
@@ -69,16 +70,13 @@ export default {
     return {
       User: "",
       select: false,
-      items: [
-        // { text: "Real-Time", icon: "mdi-clock" },
-        // { text: "Audience", icon: "mdi-account" },
-        { text: "Logout", icon: "mdi-login-variant" },
-      ],
+      amountOrder: 0,
     };
   },
   created() {
     this.User = localStorage.getItem("User");
     console.log(this.User);
+    this.getOrder();
   },
   watch: {
     top(val) {
@@ -92,6 +90,29 @@ export default {
     },
     left(val) {
       this.right = !val;
+    },
+  },
+  methods: {
+    setToken() {
+      localStorage.removeItem("Token");
+
+      this.$router.push("/login");
+    },
+    getOrder() {
+      //get orders
+      this.axios
+        .get("http://localhost:3000/api/v1/orders", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("Token")}`,
+          },
+        })
+        .then((response) => {
+          console.log("order", response.data.data.length);
+          this.amountOrder = response.data.data.length;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     },
   },
 };
