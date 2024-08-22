@@ -25,7 +25,7 @@
     >
       <span class="text-h3"> Sold Out in 24 hours Back In Stock</span>
     </h1>
-    <div class="ma-3">
+    <!-- <div class="ma-3">
       <v-slide-group class="pa-4" center-active show-arrows>
         <v-slide-item v-for="(item, index) in productData" :key="index">
           <v-card
@@ -42,10 +42,7 @@
             <v-card-subtitle v-else>
               {{ item.price }} ฿ stock: {{ item.stock }}
             </v-card-subtitle>
-
-            <!-- Adding flex-grow-1 to ensure this section takes up remaining space -->
             <div class="flex-grow-1"></div>
-
             <v-card-actions class="d-flex justify-end">
               <v-btn
                 text
@@ -68,12 +65,15 @@
                 @click="deleteItem(item)"
                 >Delete</v-btn
               >
-              <!-- <v-btn text color="info" class="align-center" href="/id">Detail</v-btn> -->
             </v-card-actions>
           </v-card>
         </v-slide-item>
       </v-slide-group>
-    </div>
+    </div> -->
+
+    <v-main>
+      <router-view />
+    </v-main>
   </div>
 </template>
 

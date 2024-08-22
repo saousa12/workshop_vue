@@ -1,40 +1,45 @@
 <template>
-  <div>
-    <v-sheet class="margin-sheet" color="white" rounded elevation="14">
+  <div class="margin-sheet">
+    <v-sheet color="white" rounded elevation="14" width="800" height="500">
       <v-row>
         <v-col>
           <div class="d-flex justify-center">
             <v-img
               src="https://cdn.pixabay.com/photo/2024/08/11/12/28/ai-generated-8961235_640.jpg"
-              height="600"
+              style="object-fit: cover"
+              height="500px"
+              width="auto"
+              class="d-flex justify-center align-center"
             />
           </div>
         </v-col>
         <v-col>
-          <h1 class="text-center">Sign in</h1>
-          <div style="padding: 5rem 0">
-            <h3>Username</h3>
-            <v-text-field
-              v-model="loginData.username"
-              outlined
-              :rules="[rules.required]"
-              :style="{ borderColor: 'red' }"
-            />
-            <h3>Password</h3>
-            <v-text-field
-              v-model="loginData.password"
-              :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
-              :rules="[rules.required, rules.min]"
-              :type="show1 ? 'text' : 'password'"
-              hint="At least 8 characters"
-              counter
-              outlined
-              @click:append="show1 = !show1"
-            ></v-text-field>
+          <div class="pa-6">
+            <h1 class="text-center">Sign in</h1>
+            <div style="padding: 3rem 0">
+              <h3>Username</h3>
+              <v-text-field
+                v-model="loginData.username"
+                outlined
+                :rules="[rules.required]"
+                :style="{ borderColor: 'red' }"
+              />
+              <h3>Password</h3>
+              <v-text-field
+                v-model="loginData.password"
+                :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
+                :rules="[rules.required, rules.min]"
+                :type="show1 ? 'text' : 'password'"
+                hint="At least 8 characters"
+                counter
+                outlined
+                @click:append="show1 = !show1"
+              ></v-text-field>
+            </div>
+            <v-btn color="info" width="100%" large @click="login">
+              Sign in
+            </v-btn>
           </div>
-          <v-btn color="info" width="100%" large @click="login">
-            Sign in
-          </v-btn>
         </v-col>
       </v-row>
     </v-sheet>
@@ -76,7 +81,7 @@ export default {
           localStorage.setItem("Token", this.token);
 
           EventBus.$emit("token", this.token);
-          alert("Login successful");
+          //alert("Login successful");
           this.$router.push({ name: "products" });
         } catch (error) {
           console.log(error);
@@ -98,13 +103,16 @@ export default {
 </script>
 
 <style>
-/* ใช้สไตล์ใน Vuetify สำหรับขอบของ input */
 .v-text-field {
   border-width: 2px;
 }
 
 .margin-sheet {
-  margin: 5vh;
+  display: flex;
+  justify-content: center; /* จัดกึ่งกลางในแนวนอน */
+  align-items: center; /* จัดกึ่งกลางในแนวตั้ง */
   padding: 20px;
+  min-height: 100vh; /* ครอบคลุมความสูงทั้งหมดของหน้าจอ */
+  box-sizing: border-box; /* ทำให้ padding รวมกับขนาด element */
 }
 </style>

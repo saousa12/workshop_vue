@@ -30,6 +30,7 @@
           {{ amountOrder }}
         </h3>
       </v-btn>
+      <v-btn href="/manage" text> Manage </v-btn>
 
       <v-btn text @click="select = !select">
         <span class="mr-2">
@@ -52,7 +53,7 @@
           <v-list-item-icon>
             <v-icon>mdi-login-variant</v-icon>
           </v-list-item-icon>
-          <v-list-item-title>Logout</v-list-item-title>
+          <v-list-item-title>logout</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-card>
@@ -96,7 +97,7 @@ export default {
     setToken() {
       localStorage.removeItem("Token");
 
-      this.$router.push("/login");
+      this.$router.push({ name: "login" });
     },
     getOrder() {
       //get orders
@@ -107,7 +108,7 @@ export default {
           },
         })
         .then((response) => {
-          console.log("order", response.data.data.length);
+          // console.log("order", response.data.data.length);
           this.amountOrder = response.data.data.length;
         })
         .catch((error) => {

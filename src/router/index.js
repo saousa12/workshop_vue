@@ -1,15 +1,21 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import HomeView from "../views/HomeView.vue";
+// import HomeView from "../views/HomeView.vue";
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
-    name: "home",
-    component: HomeView,
+    name: "login",
+    component: () => import("../components/login.vue"),
   },
+
+  // {
+  //   path: "/",
+  //   name: "home",
+  //   component: HomeView,
+  // },
   {
     path: "/about",
     name: "about",
@@ -53,16 +59,22 @@ const routes = [
         name: "orders",
         component: () => import("../views/Order.vue"),
       },
-      {
-        path: "/login",
-        name: "login",
-        component: () => import("../components/login.vue"),
-      },
+
       { path: "/me", name: "me", component: () => import("../views/Me.vue") },
       {
         path: "/grade",
         name: "grade",
         component: () => import("../views/Grade.vue"),
+      },
+      {
+        path: "/productid/:id",
+        name: "productid",
+        component: () => import("../components/productid.vue"),
+      },
+      {
+        path: "/manage",
+        name: "manage",
+        component: () => import("../views/ManageProduct.vue"),
       },
     ],
   },

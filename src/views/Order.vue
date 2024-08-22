@@ -32,6 +32,7 @@
             </v-btn>
           </div>
           <div v-if="header.value === 'actions'">
+            <!-- <v-btn color="success" class="text-white mr-2">สั่งซื้อ</v-btn> -->
             <v-btn color="error" class="text-white" @click="deleteItem(order)"
               >Delete</v-btn
             >
@@ -42,6 +43,7 @@
         </v-col>
       </v-row>
     </v-container>
+    <div>{{ orderData }}</div>
   </div>
 </template>
 
@@ -54,7 +56,7 @@ export default {
     return {
       token: "",
       orderData: [],
-      productOrderData: [],
+      // productOrderData: [],
       mergedOrders: [],
       orderItem: 0,
       headers: [
@@ -62,6 +64,7 @@ export default {
         { text: "Product Name", value: "productName" },
         { text: "Price", value: "price" },
         { text: "Order Amount", value: "" },
+        { text: "Total", value: "total" },
         { text: "Actions", value: "actions", sortable: false },
       ],
     };
@@ -80,8 +83,11 @@ export default {
       const newAmount = order.amount + amountChange;
       if (newAmount >= 0) {
         order.amount = newAmount;
-        // คุณสามารถทำการอัปเดตเพิ่มเติม เช่น ส่งคำขอไปยัง API เพื่อลบข้อมูล
       }
+      order.total = order.amount * order.price;
+      // console.log(order);
+
+      // this.productOrderData = { ...this.orderData };
     },
     async getData() {
       try {
@@ -103,25 +109,31 @@ export default {
         );
 
         const orders = ordersResponse.data.data;
-        this.orderItem = ordersResponse.data.data.length;
+        // console.log("order", orders);
+
         const products = productsResponse.data.data;
 
-        this.mergedOrders = orders.map((order) => {
-          const product = products.find((p) => p._id === order.productId);
-          return {
-            ...order,
-            productName: product ? product.productName : "Unknown",
-            price: product.price,
-          };
-        });
+        this.mergedOrders = orders
+          .map((order) => {
+            const product = products.find((p) => p._id === order.productId);
+
+            return product
+              ? {
+                  ...order,
+                  productName: product.productName,
+                  price: product.price,
+                }
+              : null;
+          })
+          .filter((order) => order !== null);
+
+        this.orderItem = this.mergedOrders.length;
       } catch (error) {
         console.error(error);
       }
     },
 
     async deleteItem(item) {
-      console.log(item);
-
       if (confirm("delete order " + item.productName)) {
         try {
           await this.axios.delete(
@@ -140,10 +152,10 @@ export default {
         }
       }
     },
-    beforeDestroy() {
-      // อย่าลืมหยุดฟังเหตุการณ์เมื่อ component ถูกทำลาย
-      EventBus.$off("token");
-    },
+  },
+  beforeDestroy() {
+    // อย่าลืมหยุดฟังเหตุการณ์เมื่อ component ถูกทำลาย
+    EventBus.$off("token");
   },
 };
 </script>
